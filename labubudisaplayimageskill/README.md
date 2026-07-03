@@ -5,6 +5,7 @@ Codex Skill for generating ecommerce image prompt packs for acrylic collectible-
 ## What It Does
 
 - Builds a structured prompt pack from a doll/reference image brief.
+- Supports grouped reference inputs for doll, acrylic structure, painted skin, and scene references.
 - Keeps the product subject as the acrylic display case, not the toy.
 - Defaults to compact doll-to-case proportions.
 - Avoids generated Chinese text in image models.
@@ -24,6 +25,23 @@ python3 .agents/skills/acrylic-labubu-display-image/scripts/build_prompts.py \
   --brief .agents/skills/acrylic-labubu-display-image/templates/product-brief.yaml \
   --output-root outputs
 ```
+
+## Grouped Reference Fields
+
+Use these fields when you have more than one kind of reference image:
+
+```yaml
+doll_reference_images:
+  - reference/doll-front.png
+acrylic_structure_reference_images:
+  - reference/acrylic-panel-edge.png
+painting_reference_images:
+  - reference/painted-skin.png
+scene_reference_images:
+  - reference/warm-desk-scene.png
+```
+
+The legacy `reference_images` field still works. If it is the only reference field, the Skill treats it as doll/display-prop reference by default.
 
 ## Validate Prompt Pack
 

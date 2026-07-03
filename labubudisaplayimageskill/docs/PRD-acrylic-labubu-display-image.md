@@ -15,6 +15,7 @@
 - 固定输出 1 张亚克力彩绘设计图提示词和 5 张电商主图提示词。
 - 默认输出 `poster_overlay_plan.md`，用于后期叠加中文标题、副标题和胶囊卖点。
 - 提供 `make_poster_overlay.py`，把无字底图合成为 `final_images/05_selling_points_final.png`。
+- 支持分组参考图：娃娃参考图、亚克力结构参考图、彩绘参考图、场景参考图分别进入不同提示词用途。
 - 保持商品主体为亚克力展示盒、防尘盒或展柜。
 - 默认使用 `market_finished_poster` 构图和 `commercial_graphic_skin` 彩绘复杂度。
 - 避免误导为 Pop Mart、Labubu 官方商品、官方联名或玩偶随盒赠送。
@@ -29,6 +30,7 @@
 ## Functional Requirements
 
 - 接收商品名、商品类型、外尺寸、内尺寸、厚度、结构、适配公仔尺寸、主题、配色、彩绘风格、卖点、参考图、平台、输出模式、图片比例。
+- 参考图应支持 `doll_reference_images`、`acrylic_structure_reference_images`、`painting_reference_images`、`scene_reference_images` 四类分组；旧版 `reference_images` 继续兼容，默认按娃娃展示参考处理。
 - 自动补全合理默认值，并在 `assumed_fields` 中标记。
 - 生成 `creative_brief.yaml`。
 - 生成 `acrylic_painted_design_prompt.md`。
@@ -44,6 +46,7 @@
 ## Acceptance Criteria
 
 - 示例 brief 可成功生成完整 prompt pack。
+- 多参考图 brief 能保留四类参考图字段，并在提示词中明确每类图的用途。
 - 校验脚本对生成结果返回 PASS。
 - 校验脚本能拒绝官方联名、官方授权等误导语句。
 - 尺寸图提示词明确要求 no text/no numbers，并预留后期叠加空间。

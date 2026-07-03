@@ -55,6 +55,35 @@ output_mode: "prompt_only"
 image_ratio: "1:1"
 """
 
+GROUPED_REFERENCE_BRIEF = """product_name: "粉紫星星多参考图亚克力展示盒"
+doll_reference_images:
+  - "/tmp/reference/doll-front.png"
+acrylic_structure_reference_images:
+  - "/tmp/reference/acrylic-panel-edge.png"
+painting_reference_images:
+  - "/tmp/reference/star-painted-skin.png"
+scene_reference_images:
+  - "/tmp/reference/warm-desk-scene.png"
+product_size_cm:
+  length: 20
+  width: 15
+  height: 24
+inner_size_cm:
+  length: 19.4
+  width: 14.4
+  height: 23.4
+acrylic_thickness_mm: 3
+box_structure: "透明罩式结构，黑色展示底座，无磁吸，干净透明正面"
+new_release_theme: "粉紫星星，甜酷梦幻"
+scene_style: "warm home desktop scene with lamp and books"
+poster_title: "高清高透"
+poster_subtitle: "亚克力防尘罩"
+poster_capsule_copy: "桌面收藏更出片 · 潮流有新意"
+output_platform: "淘宝"
+output_mode: "prompt_only"
+image_ratio: "1:1"
+"""
+
 
 def run_script(script_name, *args, check=True):
     script = SKILL_ROOT / "scripts" / script_name
@@ -205,6 +234,56 @@ class AcrylicSkillTests(unittest.TestCase):
                 self.assertIn("warm home desktop scene", text)
                 self.assertIn("post-production text overlay", text)
                 self.assertIn("shallow depth of field", text)
+
+            valid = run_script("validate_prompt_pack.py", "--pack-dir", pack_dir)
+            self.assertIn("PASS", valid.stdout)
+
+    def test_grouped_reference_images_are_preserved_and_routed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            brief_path = tmp_path / "product-brief.yaml"
+            output_root = tmp_path / "outputs"
+            brief_path.write_text(GROUPED_REFERENCE_BRIEF, encoding="utf-8")
+
+            run_script(
+                "build_prompts.py",
+                "--brief",
+                brief_path,
+                "--output-root",
+                output_root,
+                "--date",
+                "2026-07-03",
+            )
+
+            pack_dir = output_root / "2026-07-03_粉紫星星多参考图亚克力展示盒"
+            brief = (pack_dir / "creative_brief.yaml").read_text(encoding="utf-8")
+            for field in [
+                "doll_reference_images",
+                "acrylic_structure_reference_images",
+                "painting_reference_images",
+                "scene_reference_images",
+            ]:
+                self.assertIn(field, brief)
+            self.assertIn("/tmp/reference/doll-front.png", brief)
+            self.assertIn("/tmp/reference/acrylic-panel-edge.png", brief)
+            self.assertIn("/tmp/reference/star-painted-skin.png", brief)
+            self.assertIn("/tmp/reference/warm-desk-scene.png", brief)
+
+            for name in [
+                "acrylic_painted_design_prompt.md",
+                "main_image_02_lifestyle_scene.md",
+                "main_image_05_selling_points.md",
+            ]:
+                text = (pack_dir / name).read_text(encoding="utf-8")
+                self.assertIn("【分组参考图使用规则】", text)
+                self.assertIn("doll_reference_images", text)
+                self.assertIn("use only for doll scale, pose, color mood, and display prop reference", text)
+                self.assertIn("acrylic_structure_reference_images", text)
+                self.assertIn("use for acrylic transparency, panel edges, thickness, seams, base, and closure-free structure", text)
+                self.assertIn("painting_reference_images", text)
+                self.assertIn("use for commercial graphic skin complexity, color rhythm, and pattern layering", text)
+                self.assertIn("scene_reference_images", text)
+                self.assertIn("use for warm home desktop scene, lighting, props, and background depth", text)
 
             valid = run_script("validate_prompt_pack.py", "--pack-dir", pack_dir)
             self.assertIn("PASS", valid.stdout)

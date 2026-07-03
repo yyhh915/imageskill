@@ -65,6 +65,23 @@ docs/
 - Injection scope: strong injection in `acrylic_painted_design_prompt.md`, `main_image_01_white_background.md`, `main_image_02_lifestyle_scene.md`, and `main_image_05_selling_points.md`; light fit reminder in `main_image_03_detail.md`; compact fitted case reminder in `main_image_04_dimension_base.md` while preserving the clean base image and post-production dimension overlay workflow.
 - Negative prompt library must include: `no oversized acrylic display case`, `no giant acrylic box`, `no generic large showcase`, `no large empty space above the doll`, `no excessive side clearance`, `no excessive depth inside the case`, `no tiny doll inside a big box`, `no cube-like oversized display cabinet`, `no display case much taller than the doll`, `no wide empty interior around the figure`, and `no product made oversized to dominate the doll`.
 
+## 分组参考图路由
+
+Brief fields:
+
+- `reference_images`: legacy mixed reference list, kept for backward compatibility.
+- `doll_reference_images`: doll scale, pose, color mood, and display prop reference only.
+- `acrylic_structure_reference_images`: acrylic transparency, panel edges, thickness, seams, base, and closure-free structure reference only.
+- `painting_reference_images`: commercial graphic skin complexity, color rhythm, and pattern layering reference only.
+- `scene_reference_images`: warm home desktop scene, lighting, props, and background depth reference only.
+
+Compatibility behavior:
+
+- If only legacy `reference_images` is provided and all grouped fields are empty, `build_prompts.py` copies those images into `doll_reference_images`.
+- Prompt sections must include `【分组参考图使用规则】`.
+- English prompts must include explicit grouped routing instructions so the image model does not mix reference roles.
+- Reference images must not cause the toy to become the sold product, copy logos, copy official packaging, or introduce unwanted hardware.
+
 ## 第二阶段比例修复：ultra_compact_fit
 
 The first compact-fit pass used a 75% interior-height target. Test images still looked like oversized generic cabinets: too much top clearance, side clearance, and depth, with the doll visually small inside the box. The second-stage fix makes `ultra_compact_fit` the default for reference-image-only briefs.
@@ -229,6 +246,7 @@ python3 /Users/Admin/.codex/skills/.system/skill-creator/scripts/quick_validate.
 ## Acceptance Criteria
 
 - A brief with only doll reference images and no size fields outputs `fit_mode: "ultra_compact_fit"` in `creative_brief.yaml`.
+- A brief with grouped reference images preserves `doll_reference_images`, `acrylic_structure_reference_images`, `painting_reference_images`, and `scene_reference_images` in `creative_brief.yaml`, and routes each group to the correct prompt purpose.
 - The design prompt and main images 1, 2, and 5 explicitly state that the doll fills 88%-92% of the interior height and 72%-82% of the interior width.
 - The prompt pack explicitly says: `Shrink the acrylic case around the doll; do not shrink the doll to fit a large case.`
 - Negative prompts reject oversized acrylic display cases, tiny dolls inside big boxes, and large empty space above the doll.
